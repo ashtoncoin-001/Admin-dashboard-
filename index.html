@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101b17">
+<title>Beyond the Screen | Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --bg:#0b100e;
+  --panel:#131c18;
+  --panel2:#19251f;
+  --gold:#d9b66f;
+  --text:#f4f0e7;
+  --muted:#a5b0a8;
+  --border:#2b3b32;
+  --danger:#e87878;
+  --success:#83d5a2;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+  line-height:1.5;
+}
+
+button,input,textarea,select { font:inherit; }
+button { cursor:pointer; }
+
+header {
+  padding:20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+}
+
+.brand {
+  color:var(--gold);
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+header small {
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:2px;
+  margin-top:4px;
+}
+
+main {
+  width:min(1100px,94%);
+  margin:35px auto;
+}
+
+.panel {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:22px;
+  margin-bottom:22px;
+}
+
+h1,h2,h3 { margin-top:0; }
+h1 { font-size:27px; }
+h2 { font-size:19px; }
+p { color:var(--muted); }
+
+label {
+  display:block;
+  margin:14px 0 6px;
+  font-size:13px;
+  color:#d6ddd7;
+}
+
+input,textarea,select {
+  width:100%;
+  padding:12px;
+  background:#0b120e;
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:8px;
+  outline:none;
+}
+
+input:focus,textarea:focus,select:focus {
+  border-color:var(--gold);
+}
+
+input[type="file"] {
+  padding:10px;
+  font-size:13px;
+}
+
+textarea {
+  min-height:130px;
+  resize:vertical;
+}
+
+button {
+  border:0;
+  border-radius:8px;
+  padding:11px 15px;
+  font-weight:700;
+}
+
+.primary {
+  background:var(--gold);
+  color:#17140c;
+}
+
+.secondary {
+  background:var(--panel2);
+  color:var(--text);
+  border:1px solid var(--border);
+}
+
+.danger {
+  background:#4a2020;
+  color:#ffdada;
+}
+
+button:disabled {
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+.actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:18px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:0 15px;
+}
+
+.full { grid-column:1/-1; }
+
+.notice {
+  padding:12px;
+  border-radius:8px;
+  margin:15px 0;
+  display:none;
+  overflow-wrap:anywhere;
+}
+
+.notice.error {
+  display:block;
+  background:#401f1f;
+  color:#ffd5d5;
+}
+
+.notice.success {
+  display:block;
+  background:#183b28;
+  color:#bdf3cc;
+}
+
+.content-card {
+  background:var(--panel2);
+  border:1px solid var(--border);
+  padding:16px;
+  border-radius:10px;
+  margin:12px 0;
+  overflow-wrap:anywhere;
+}
+
+.content-card h3 { margin-bottom:6px; }
+
+.meta {
+  font-size:12px;
+  color:var(--muted);
+  margin:6px 0;
+}
+
+.hidden { display:none!important; }
+
+.check-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:15px;
+}
+
+.check-row input {
+  width:auto;
+}
+
+.media-box {
+  background:#0b120e;
+  border:1px dashed var(--border);
+  border-radius:10px;
+  padding:14px;
+  margin-top:10px;
+}
+
+.media-box img,
+.media-box video {
+  display:block;
+  max-width:100%;
+  max-height:340px;
+  margin:12px auto;
+  border-radius:8px;
+  object-fit:contain;
+}
+
+.media-status {
+  font-size:12px;
+  color:var(--muted);
+  overflow-wrap:anywhere;
+  margin-top:8px;
+}
+
+.hint {
+  font-size:12px;
+  color:var(--muted);
+}
+
+.progress {
+  height:6px;
+  background:var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.progress span {
+  display:block;
+  width:0;
+  height:100%;
+  background:var(--gold);
+  transition:width .2s;
+}
+
+footer {
+  text-align:center;
+  color:var(--muted);
+  padding:30px;
+  font-size:12px;
+}
+
+@media(max-width:650px) {
+  .grid { grid-template-columns:1fr; }
+  .full { grid-column:auto; }
+  header { align-items:flex-start; }
+  h1 { font-size:23px; }
+  .panel { padding:16px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+    BEYOND THE SCREEN
+    <small>ADMINISTRATION</small>
+  </div>
+  <button id="logoutBtn" class="secondary hidden">Sign out</button>
+</header>
+
+<main>
+
+  <!-- LOGIN -->
+  <section id="loginPanel" class="panel">
+    <h1>Administrator Login</h1>
+    <p>Sign in to manage website content and media.</p>
+
+    <div id="loginNotice" class="notice"></div>
+
+    <form id="loginForm">
+      <label for="email">Administrator email</label>
+      <input id="email" type="email"
+        autocomplete="username" required
+        placeholder="you@example.com">
+
+      <label for="password">Password</label>
+      <input id="password" type="password"
+        autocomplete="current-password" required>
+
+      <div class="actions">
+        <button class="primary" id="loginBtn" type="submit">
+          Sign in
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="hidden">
+
+    <div class="panel">
+      <h1>Content Dashboard</h1>
+      <p>Create, edit, publish and organize your website content.</p>
+
+      <div id="statusNotice" class="notice"></div>
+
+      <div class="actions">
+        <button id="newBtn" class="primary">+ New content</button>
+        <button id="refreshBtn" class="secondary">Refresh content</button>
+      </div>
+    </div>
+
+    <!-- CONTENT EDITOR -->
+    <section class="panel" id="editorPanel">
+      <h2 id="editorHeading">Create content</h2>
+
+      <form id="contentForm">
+        <input type="hidden" id="contentId">
+
+        <div class="grid">
+
+          <div>
+            <label for="contentType">Content type</label>
+            <select id="contentType" required>
+              <option value="journal">Journal</option>
+              <option value="featured_story">Featured story</option>
+              <option value="production">Production</option>
+              <option value="artist_profile">Artist profile</option>
+              <option value="event">Event</option>
+              <option value="experience">Private experience</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="minimumTier">Minimum membership tier</label>
+            <select id="minimumTier">
+              <option value="">General — everyone with valid access</option>
+              <option value="1">Bronze and above</option>
+              <option value="2">Silver and above</option>
+              <option value="3">Gold and above</option>
+              <option value="4">Diamond only</option>
+            </select>
+          </div>
+
+          <div class="full">
+            <label for="title">Title</label>
+            <input id="title" required maxlength="200"
+              placeholder="Enter a title">
+          </div>
+
+          <div class="full">
+            <label for="slug">URL slug (optional)</label>
+            <input id="slug" maxlength="200"
+              placeholder="example-story">
+          </div>
+
+          <div class="full">
+            <label for="summary">Short summary</label>
+            <textarea id="summary" style="min-height:75px"
+              placeholder="A short introduction"></textarea>
+          </div>
+
+          <div class="full">
+            <label for="body">Main content</label>
+            <textarea id="body"
+              placeholder="Write your article or content here"></textarea>
+          </div>
+
+          <!-- IMAGE UPLOAD -->
+          <div class="full">
+            <h2 style="margin:24px 0 5px">📸 Post image</h2>
+            <p class="hint">
+              Choose a photo from your phone. It will upload to your
+              private Supabase Storage bucket when you save the post.
+            </p>
+
+            <label for="imageFile">Choose image</label>
+            <input
+              id="imageFile"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+            >
+
+            <div class="media-box">
+              <div id="imagePreview">
+                <p class="hint">No new image selected.</p>
+              </div>
+              <div id="imageStatus" class="media-status"></div>
+
+              <button type="button" id="clearImageBtn"
+                class="secondary">
+                Remove image from post
+              </button>
+            </div>
+
+            <label for="imagePath">Current image path</label>
+            <input id="imagePath" readonly
+              placeholder="No image uploaded yet">
+
+            <p class="hint">
+              Existing media will remain unless you choose a replacement
+              or remove it.
+            </p>
+          </div>
+
+          <!-- VIDEO UPLOAD -->
+          <div class="full">
+            <h2 style="margin:24px 0 5px">🎥 Post video</h2>
+            <p class="hint">
+              Choose an MP4, WebM or OGG video from your phone.
+              Large videos may take longer to upload.
+            </p>
+
+            <label for="videoFile">Choose video</label>
+            <input
+              id="videoFile"
+              type="file"
+              accept="video/mp4,video/webm,video/ogg"
+            >
+
+            <div class="media-box">
+              <div id="videoPreview">
+                <p class="hint">No new video selected.</p>
+              </div>
+              <div id="videoStatus" class="media-status"></div>
+
+              <button type="button" id="clearVideoBtn"
+                class="secondary">
+                Remove video from post
+              </button>
+            </div>
+
+            <label for="videoUrl">Current video path or external URL</label>
+            <input id="videoUrl" readonly
+              placeholder="No video uploaded yet">
+          </div>
+
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" id="published">
+          Publish this content
+        </label>
+
+        <div class="actions">
+          <button class="primary" id="saveBtn" type="submit">
+            Save content
+          </button>
+          <button class="secondary" id="cancelBtn" type="button">
+            Clear form
+          </button>
+        </div>
+
+        <div class="progress">
+          <span id="uploadProgress"></span>
+        </div>
+
+        <p id="uploadProgressText" class="hint"></p>
+      </form>
+    </section>
+
+    <!-- EXISTING CONTENT -->
+    <section class="panel">
+      <h2>Existing content</h2>
+      <p>Choose an item to edit it, or delete it permanently.</p>
+      <div id="contentList">Loading content…</div>
+    </section>
+
+  </section>
+</main>
+
+<footer>Beyond the Screen · Private administration</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  const SUPABASE_URL =
+    "https://zxtrxziphpxcpvccbnxp.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_DB-oUP45bXeuc5rWfzl1bw_PEAGYvtp";
+
+  const BUCKET = "bts-media";
+
+  // These limits help avoid accidental oversized uploads.
+  const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+  const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  const $ = id => document.getElementById(id);
+
+  let currentItems = [];
+  let busy = false;
+
+  let selectedImage = null;
+  let selectedVideo = null;
+
+  let removeImage = false;
+  let removeVideo = false;
+
+  let imagePreviewURL = null;
+  let videoPreviewURL = null;
+
+  function notice(id, message, type = "error") {
+    const el = $(id);
+    el.textContent = message;
+    el.className = "notice " + type;
+  }
+
+  function clearNotice(id) {
+    const el = $(id);
+    el.textContent = "";
+    el.className = "notice";
+  }
+
+  function setBusy(value) {
+    busy = value;
+
+    $("loginBtn").disabled = value;
+    $("saveBtn").disabled = value;
+    $("refreshBtn").disabled = value;
+    $("newBtn").disabled = value;
+  }
+
+  function setProgress(percent, message = "") {
+    $("uploadProgress").style.width =
+      Math.max(0, Math.min(100, percent)) + "%";
+
+    $("uploadProgressText").textContent = message;
+  }
+
+  async function callAdmin(action, extra = {}) {
+    const { data: sessionData, error: sessionError } =
+      await client.auth.getSession();
+
+    if (sessionError || !sessionData.session) {
+      throw new Error("Your login has expired. Please sign in again.");
+    }
+
+    const { data, error } = await client.functions.invoke(
+      "admin-content",
+      {
+        body: { action, ...extra }
+      }
+    );
+
+    if (error) {
+      let message = error.message || "The request failed.";
+
+      if (error.context &&
+          typeof error.context.json === "function") {
+        try {
+          const detail = await error.context.json();
+          if (detail.error) message = detail.error;
+        } catch (_) {}
+      }
+
+      throw new Error(message);
+    }
+
+    if (data && data.error) {
+      throw new Error(data.error);
+    }
+
+    return data;
+  }
+
+  function showDashboard() {
+    $("loginPanel").classList.add("hidden");
+    $("dashboard").classList.remove("hidden");
+    $("logoutBtn").classList.remove("hidden");
+  }
+
+  function showLogin() {
+    $("loginPanel").classList.remove("hidden");
+    $("dashboard").classList.add("hidden");
+    $("logoutBtn").classList.add("hidden");
+  }
+
+  async function checkSession() {
+    const { data } = await client.auth.getSession();
+
+    if (data.session) {
+      try {
+        // The existing server function checks administrator privileges.
+        await callAdmin("list");
+
+        showDashboard();
+        await loadContent();
+        return;
+      } catch (_) {
+        await client.auth.signOut();
+      }
+    }
+
+    showLogin();
+  }
+
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (busy) return;
+
+    setBusy(true);
+    clearNotice("loginNotice");
+
+    try {
+      const { data, error } = await client.storage
+  .from(BUCKET)
+  .upload(filePath, file, {
+    contentType,
+    cacheControl: "3600",
+    upsert: false
+  });
+
+if (error) {
+  console.error("Supabase video upload error:", {
+    message: error.message,
+    name: error.name,
+    statusCode: error.statusCode
+  });
+
+  throw new Error(
+    "Video upload failed: " +
+    error.message +
+    (error.statusCode ? " (HTTP " + error.statusCode + ")" : "")
+  );
+}
+
+      try {
+        await callAdmin("list");
+      } catch (error) {
+        await client.auth.signOut();
+        throw new Error(
+          error.message ||
+          "This account does not have administrator access."
+        );
+      }
+
+      $("password").value = "";
+      showDashboard();
+
+      notice(
+        "statusNotice",
+        "Welcome. You are signed in.",
+        "success"
+      );
+
+      await loadContent();
+
+    } catch (error) {
+      notice(
+        "loginNotice",
+        error.message || "Unable to sign in."
+      );
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  $("logoutBtn").addEventListener("click", async () => {
+    await client.auth.signOut();
+    showLogin();
+    clearNotice("loginNotice");
+    clearNotice("statusNotice");
+  });
+
+  /*
+   * MEDIA PREVIEW
+   */
+
+  function clearPreviewURL(type) {
+    if (type === "image" && imagePreviewURL) {
+      URL.revokeObjectURL(imagePreviewURL);
+      imagePreviewURL = null;
+    }
+
+    if (type === "video" && videoPreviewURL) {
+      URL.revokeObjectURL(videoPreviewURL);
+      videoPreviewURL = null;
+    }
+  }
+
+  function resetMediaSelection() {
+    clearPreviewURL("image");
+    clearPreviewURL("video");
+
+    selectedImage = null;
+    selectedVideo = null;
+
+    removeImage = false;
+    removeVideo = false;
+
+    $("imageFile").value = "";
+    $("videoFile").value = "";
+
+    $("imagePreview").innerHTML =
+      '<p class="hint">No new image selected.</p>';
+
+    $("videoPreview").innerHTML =
+      '<p class="hint">No new video selected.</p>';
+
+    $("imageStatus").textContent = "";
+    $("videoStatus").textContent = "";
+
+    $("clearImageBtn").textContent = "Remove image from post";
+    $("clearVideoBtn").textContent = "Remove video from post";
+  }
+
+  function previewImage(file) {
+    clearPreviewURL("image");
+
+    selectedImage = file;
+    removeImage = false;
+
+    imagePreviewURL = URL.createObjectURL(file);
+
+    const img = document.createElement("img");
+    img.src = imagePreviewURL;
+    img.alt = "Selected image preview";
+
+    $("imagePreview").replaceChildren(img);
+
+    const info = document.createElement("p");
+    info.className = "hint";
+    info.textContent =
+      file.name + " · " + (file.size / 1024 / 1024).toFixed(2) + " MB";
+
+    $("imagePreview").append(info);
+    $("imageStatus").textContent =
+      "Ready to upload when you save the post.";
+  }
+
+  function previewVideo(file) {
+    clearPreviewURL("video");
+
+    selectedVideo = file;
+    removeVideo = false;
+
+    videoPreviewURL = URL.createObjectURL(file);
+
+    const video = document.createElement("video");
+    video.src = videoPreviewURL;
+    video.controls = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+
+    $("videoPreview").replaceChildren(video);
+
+    const info = document.createElement("p");
+    info.className = "hint";
+    info.textContent =
+      file.name + " · " + (file.size / 1024 / 1024).toFixed(2) + " MB";
+
+    $("videoPreview").append(info);
+    $("videoStatus").textContent =
+      "Ready to upload when you save the post.";
+  }
+
+  $("imageFile").addEventListener("change", () => {
+    const file = $("imageFile").files[0];
+    if (!file) return;
+
+    const allowed = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif"
+    ];
+
+    if (!allowed.includes(file.type)) {
+      $("imageFile").value = "";
+      notice(
+        "statusNotice",
+        "Choose a JPG, PNG, WebP or GIF image."
+      );
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      $("imageFile").value = "";
+      notice(
+        "statusNotice",
+        "This image is too large. The limit is 10 MB."
+      );
+      return;
+    }
+
+    clearNotice("statusNotice");
+    previewImage(file);
+  });
+
+  $("videoFile").addEventListener("change", () => {
+    const file = $("videoFile").files[0];
+    if (!file) return;
+
+    const allowed = [
+      "video/mp4",
+      "video/webm",
+      "video/ogg"
+    ];
+
+    if (!allowed.includes(file.type)) {
+      $("videoFile").value = "";
+      notice(
+        "statusNotice",
+        "Choose an MP4, WebM or OGG video."
+      );
+      return;
+    }
+
+    if (file.size > MAX_VIDEO_SIZE) {
+      $("videoFile").value = "";
+      notice(
+        "statusNotice",
+        "This video exceeds the 100 MB limit."
+      );
+      return;
+    }
+
+    clearNotice("statusNotice");
+    previewVideo(file);
+  });
+
+  /*
+   * STORAGE UPLOAD
+   *
+   * Files are stored in the private bts-media bucket.
+   * The current administrator's authenticated session is used.
+   */
+
+  function safeFileName(name) {
+    return name
+      .normalize("NFKD")
+      .replace(/[^a-zA-Z0-9._-]/g, "-")
+      .replace(/-+/g, "-")
+      .slice(-120);
+  }
+
+  async function uploadMedia(file, type, progressBase, progressSpan) {
+    const { data: userData, error: userError } =
+      await client.auth.getUser();
+
+    if (userError || !userData.user) {
+      throw new Error("Please sign in again before uploading media.");
+    }
+
+    const userId = userData.user.id;
+    const folder = type === "image" ? "images" : "videos";
+
+    const filePath =
+      folder + "/" +
+      userId + "/" +
+      Date.now() + "-" +
+      crypto.randomUUID() + "-" +
+      safeFileName(file.name);
+
+    const contentType = file.type ||
+      (type === "image" ? "image/jpeg" : "video/mp4");
+
+    if (type === "image") {
+      $("imageStatus").textContent = "Uploading image…";
+    } else {
+      $("videoStatus").textContent = "Uploading video…";
+    }
+
+    setProgress(progressBase, "Uploading " + type + "…");
+
+    const { data, error } = await client.storage
+      .from(BUCKET)
+      .upload(filePath, file, {
+        contentType,
+        cacheControl: "3600",
+        upsert: false
+      });
+
+    if (error) {
+      throw new Error(
+        "Unable to upload " + type + ": " + error.message
+      );
+    }
+
+    setProgress(
+      progressSpan,
+      type === "image" ? "Image uploaded." : "Video uploaded."
+    );
+
+    if (type === "image") {
+      $("imageStatus").textContent =
+        "Uploaded successfully. Saving file path with the post.";
+    } else {
+      $("videoStatus").textContent =
+        "Uploaded successfully. Saving file path with the post.";
+    }
+
+    // Return the private object path, not a public URL.
+    return data.path;
+  }
+
+  /*
+   * EXISTING CONTENT LIST
+   */
+
+  async function loadContent() {
+    $("contentList").textContent = "Loading content…";
+
+    try {
+      const result = await callAdmin("list");
+      currentItems = result.content || [];
+
+      if (!currentItems.length) {
+        $("contentList").textContent =
+          "No content yet. Create your first post above.";
+        return;
+      }
+
+      $("contentList").replaceChildren();
+
+      currentItems.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "content-card";
+
+        const title = document.createElement("h3");
+        title.textContent = item.title;
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent =
+          item.content_type.replaceAll("_", " ") +
+          " · " +
+          (item.is_published ? "Published" : "Draft") +
+          " · " +
+          (item.minimum_tier_id == null
+            ? "General access"
+            : "Minimum tier ID: " + item.minimum_tier_id);
+
+        const summary = document.createElement("p");
+        summary.textContent =
+          item.summary || "No summary supplied.";
+
+        const mediaInfo = document.createElement("div");
+        mediaInfo.className = "meta";
+        mediaInfo.textContent =
+          (item.image_path ? "Image attached" : "No image") +
+          " · " +
+          (item.video_url ? "Video attached" : "No video");
+
+        const edit = document.createElement("button");
+        edit.className = "secondary";
+        edit.textContent = "Edit";
+        edit.addEventListener("click", () => editItem(item.id));
+
+        const del = document.createElement("button");
+        del.className = "danger";
+        del.textContent = "Delete";
+        del.addEventListener("click", () => deleteItem(item.id));
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        actions.append(edit, del);
+
+        card.append(title, meta, summary, mediaInfo, actions);
+        $("contentList").append(card);
+      });
+
+    } catch (error) {
+      $("contentList").textContent = error.message;
+    }
+  }
+
+  /*
+   * FORM RESET AND EDITING
+   */
+
+  function resetForm() {
+    clearPreviewURL("image");
+    clearPreviewURL("video");
+
+    $("contentForm").reset();
+    $("contentId").value = "";
+
+    $("imagePath").value = "";
+    $("videoUrl").value = "";
+
+    $("editorHeading").textContent = "Create content";
+    $("saveBtn").textContent = "Save content";
+
+    resetMediaSelection();
+    setProgress(0, "");
+    clearNotice("statusNotice");
+  }
+
+  $("newBtn").addEventListener("click", () => {
+    resetForm();
+    $("editorPanel").scrollIntoView({ behavior: "smooth" });
+  });
+
+  $("cancelBtn").addEventListener("click", resetForm);
+
+  function editItem(id) {
+    const item = currentItems.find(entry => entry.id === id);
+    if (!item) return;
+
+    resetForm();
+
+    $("contentId").value = item.id;
+    $("contentType").value = item.content_type;
+    $("title").value = item.title || "";
+    $("slug").value = item.slug || "";
+    $("summary").value = item.summary || "";
+    $("body").value = item.body || "";
+
+    $("imagePath").value = item.image_path || "";
+    $("videoUrl").value = item.video_url || "";
+
+    $("minimumTier").value =
+      item.minimum_tier_id == null
+        ? ""
+        : String(item.minimum_tier_id);
+
+    $("published").checked = item.is_published === true;
+
+    if (item.image_path) {
+      $("imagePreview").innerHTML =
+        '<p class="hint">Existing image is attached. Select another image to replace it.</p>';
+    }
+
+    if (item.video_url) {
+      $("videoPreview").innerHTML =
+        '<p class="hint">Existing video is attached. Select another video to replace it.</p>';
+    }
+
+    $("editorHeading").textContent = "Edit content";
+    $("saveBtn").textContent = "Update content";
+
+    $("editorPanel").scrollIntoView({ behavior: "smooth" });
+  }
+
+  /*
+   * REMOVE MEDIA FROM A POST
+   *
+   * This clears the media reference in the database on save.
+   * It does not immediately delete the underlying Storage file.
+   */
+
+  $("clearImageBtn").addEventListener("click", () => {
+    selectedImage = null;
+    removeImage = true;
+
+    clearPreviewURL("image");
+    $("imageFile").value = "";
+    $("imagePath").value = "";
+
+    $("imagePreview").innerHTML =
+      '<p class="hint">Image will be removed from this post when saved.</p>';
+
+    $("imageStatus").textContent = "";
+  });
+
+  $("clearVideoBtn").addEventListener("click", () => {
+    selectedVideo = null;
+    removeVideo = true;
+
+    clearPreviewURL("video");
+    $("videoFile").value = "";
+    $("videoUrl").value = "";
+
+    $("videoPreview").innerHTML =
+      '<p class="hint">Video will be removed from this post when saved.</p>';
+
+    $("videoStatus").textContent = "";
+  });
+
+  /*
+   * SAVE CONTENT AND UPLOAD SELECTED FILES
+   */
+
+  $("contentForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (busy) return;
+
+    setBusy(true);
+    clearNotice("statusNotice");
+    setProgress(0, "");
+
+    let uploadedImagePath = null;
+    let uploadedVideoPath = null;
+
+    try {
+      const id = $("contentId").value;
+
+      // Start with existing paths when editing.
+      let imagePath = $("imagePath").value.trim() || null;
+      let videoUrl = $("videoUrl").value.trim() || null;
+
+      if (removeImage) imagePath = null;
+      if (removeVideo) videoUrl = null;
+
+      // Upload media before saving the content record.
+      if (selectedImage) {
+        uploadedImagePath = await uploadMedia(
+          selectedImage,
+          "image",
+          10,
+          45
+        );
+
+        imagePath = uploadedImagePath;
+      }
+
+      if (selectedVideo) {
+        uploadedVideoPath = await uploadMedia(
+          selectedVideo,
+          "video",
+          50,
+          85
+        );
+
+        videoUrl = uploadedVideoPath;
+      }
+
+      const rawTier = $("minimumTier").value;
+
+      const content = {
+        content_type: $("contentType").value,
+        title: $("title").value.trim(),
+        slug: $("slug").value.trim() || null,
+        summary: $("summary").value.trim() || null,
+        body: $("body").value || null,
+        image_path: imagePath,
+        video_url: videoUrl,
+        minimum_tier_id:
+          rawTier === "" ? null : Number(rawTier),
+        is_published: $("published").checked
+      };
+
+      setProgress(90, "Saving content record…");
+
+      if (id) {
+        await callAdmin("update", { id, content });
+      } else {
+        await callAdmin("create", { content });
+      }
+
+      setProgress(100, "Saved successfully.");
+
+      notice(
+        "statusNotice",
+        "Content saved successfully." +
+        ((uploadedImagePath || uploadedVideoPath)
+          ? " Media uploaded to private Storage."
+          : ""),
+        "success"
+      );
+
+      resetForm();
+      await loadContent();
+
+    } catch (error) {
+      notice(
+        "statusNotice",
+        (error.message || "Unable to save content.") +
+        (
+          uploadedImagePath || uploadedVideoPath
+            ? " A file may have uploaded before the save failed. Check Storage before retrying."
+            : ""
+        )
+      );
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  /*
+   * DELETE CONTENT
+   */
+
+  async function deleteItem(id) {
+    const item = currentItems.find(entry => entry.id === id);
+    if (!item) return;
+
+    if (!confirm('Permanently delete "' + item.title + '"?')) return;
+
+    try {
+      await callAdmin("delete", { id });
+
+      notice(
+        "statusNotice",
+        "Content deleted. Associated media files are not automatically deleted.",
+        "success"
+      );
+
+      await loadContent();
+
+    } catch (error) {
+      notice(
+        "statusNotice",
+        error.message || "Unable to delete content."
+      );
+    }
+  }
+
+  $("refreshBtn").addEventListener("click", loadContent);
+
+  client.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT" || !session) {
+      showLogin();
+    }
+  });
+
+  checkSession();
+})();
+</script>
+
+</body>
+</html>
